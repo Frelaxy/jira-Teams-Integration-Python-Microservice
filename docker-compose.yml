@@ -1,0 +1,58 @@
+---
+version: '3.7'
+
+services:
+  app:
+    build: src
+    restart: unless-stopped
+    environment:
+      - APP_WEBHOOK=TEAMS_URL_WEBHOOK
+      - JIRA_SERVER=JIRA_SERVER
+      - JIRA_LOGIN=JIRA_LOGIN
+      - JIRA_API_TOKEN=JIRA_API_TOKEN
+    ports:
+    - '80:80'
+    volumes:
+      - "$AP_CONFIG/microservice-jira-teams-api/src/app:/microservice/app"
+      - "$AP_CONFIG/microservice-jira-teams-api/log:/microservice/log"
+    logging:
+      driver: json-file
+      options:
+        tag: "{{.ID}}/{{.Name}}/microservice-jira-teams-api/app"
+    profiles: ["production"]
+  app-test:
+    build: src
+    restart: unless-stopped
+    environment:
+      - APP_WEBHOOK=TEAMS_URL_WEBHOOK
+      - JIRA_SERVER=JIRA_SERVER
+      - JIRA_LOGIN=JIRA_LOGIN
+      - JIRA_API_TOKEN=JIRA_API_TOKEN
+    ports:
+    - '80:80'
+    volumes:
+      - "$AP_CONFIG/microservice-jira-teams-api/src/app:/microservice/app"
+      - "$AP_CONFIG/microservice-jira-teams-api/log:/microservice/log"
+    logging:
+      driver: json-file
+      options:
+        tag: "{{.ID}}/{{.Name}}/microservice-jira-teams-api/app"
+    profiles: ["test"]
+  app-local:
+    build: ./
+    restart: unless-stopped
+    environment:
+      - APP_WEBHOOK=TEAMS_URL_WEBHOOK
+      - JIRA_SERVER=JIRA_SERVER
+      - JIRA_LOGIN=JIRA_LOGIN
+      - JIRA_API_TOKEN=JIRA_API_TOKEN
+    ports:
+    - '80:80'
+    volumes:
+      - "./app:/microservice/app"
+      - "../log:/microservice/log"
+    logging:
+      driver: json-file
+      options:
+        tag: "{{.ID}}/{{.Name}}/microservice-jira-teams-api/app"
+    profiles: ["local"]

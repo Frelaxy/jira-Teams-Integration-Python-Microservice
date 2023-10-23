@@ -1,0 +1,153 @@
+{
+    "type": "message",
+    "attachments": [
+        {
+            "contentType": "application/vnd.microsoft.card.adaptive",
+            "content": {
+                "type": "AdaptiveCard",
+                "body": [
+                {
+                    "type": "ColumnSet",
+                    "columns": [
+                        {
+                            "type": "Column",
+                            "items": [
+                                {
+                                    "type": "Image",
+                                    "style": "default",
+                                    "url": "https://urlp.asm.skype.com/v1/url/content?url=https%3A%2F%2Fmsteamsconnectors-web.azureedge.net%2FJiraServer%2Fimages%2Flogo.png",
+                                    "size": "medium"
+                                }
+                            ],
+                            "width": "auto"
+                        },
+                        {
+                            "type": "Column",
+                            "items": [
+                                {
+                                    "type": "TextBlock",
+                                    "text":"[**{{ ticket.key }}: {{ ticket.summary() }}**](https://jira.activeplatform.com/browse/{{ ticket.key }})",
+                                    "wrap": true
+                                },
+                                {
+                                    "type": "TextBlock",
+                                    "spacing": "small",
+                                    "text": "Was updated at {{ ticket.updating_time() }} by {{ ticket.reporter_email() }}",
+                                    "size": "small",
+                                    "separator": "true",
+                                    "wrap": true
+                                }
+                            ],
+                            "width": "stretch"
+                        }
+                    ],
+{% if ticket.type() == "Incident"  %}
+                    "style": "attention",
+{% else %}
+                    "style": "good",
+{% endif %}
+                    "bleed": true
+                },
+                {
+                    "type": "FactSet",
+                    "spacing": "large",
+                    "facts": [
+                        {
+                            "title": "Customer:",
+                            "value": "{{ ticket.customer_name() }}"
+                        },
+                        {
+                            "title": "Issue type:",
+                            "value": "{{ ticket.type() }}"
+                        },
+                        {
+                            "title": "Priority:",
+                            "value": "{{ ticket.priority() }}"
+                        },
+                        {
+                            "title": "Status:",
+                            "value": "{{ ticket.status() }}"
+                        },
+                        {
+                            "title": "Assignee:",
+{% if ticket.assignee_name() == "" %}
+                            "value": ""
+{% else %}
+                            "value": "<at>{{ ticket.assignee_name() }}</at>"
+{% endif %}
+                        }
+                    ]
+                },
+                {
+                    "type": "TextBlock",
+                    "text": "Comment:",
+                    "size": "default",
+                    "style": "default",
+                    "weight": "bolder",
+                    "wrap": false
+                },
+                {
+                    "type": "TextBlock",
+                    "text": "{{ ticket.last_comment() }}",
+                    "size": "default",
+                    "style": "default",
+                    "spacing": "small",
+                    "weight": "lighter",
+                    "wrap": true,
+                    "maxLines": 5
+                }
+{% if ticket.assignee_name() == "" %}
+                ,{
+                    "type": "TextBlock",
+                    "text": "Pay attention {% for key in team %} <at>{{- key -}}</at> {% endfor %}",
+                    "size": "small",
+                    "spacing": "small",
+                    "horizontalAlignment": "Right",
+                    "isSubtle": true,
+                    "weight": "lighter",
+                    "wrap": true
+                }
+{% endif %}               
+                ],
+                "msteams":
+{% if ticket.assignee_name() == "" %}
+                {
+                    "width": "Full",
+                    "entities": [
+    {% for key in team %}
+                        {
+                            "type": "mention",
+                            "text": "<at>{{ key }}</at>",
+                            "mentioned": {
+                                "id": "{{ team[key] }}",
+                                "name": "{{ key }}"
+                            }
+                        }
+        {% if key != team.keys() | last %}
+                        ,
+        {% endif %}
+    {% endfor %}
+                    ]
+                },
+{% else %}
+                {
+                    "width": "Full",
+                    "entities": [
+                        {
+                            "type": "mention",
+                            "width": "Full",
+                            "text": "<at>{{ ticket.assignee_name() }}</at>",
+                            "mentioned": {
+                                "id": "{{ ticket.assignee_email() }}",
+                                "name": "{{ ticket.assignee_name() }}"
+                            }
+                        }
+                    ]
+                },
+{% endif %}
+                "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+                "version": "1.4"
+            }
+        }
+    ]
+}

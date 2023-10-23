@@ -1,0 +1,12 @@
+This application is a simple FastAPI Application which can get api webhook from Jira, parse it and send webhook to Teams.
+
+
+Deployment steps: 
+run docker container with project:
+docker compose --profile production up -d [For Production mode - sending to Jira Server channel]
+or
+docker compose --profile test up -d [For Test mode - sending to Pythonista channel]
+or
+docker compose --profile local up -d [For test mode on the local machine - sending to Pythonista channel] 
+
+Make jira's notifications great again!
